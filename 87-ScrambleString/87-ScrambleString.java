@@ -1,0 +1,47 @@
+// Last updated: 7/17/2026, 3:16:38 PM
+class Solution {
+    public boolean isScramble(String s1, String s2) {
+        Map<String, Boolean> memo = new HashMap<>();
+        return solve(s1, s2, memo);
+    }
+
+    private boolean solve(String s1, String s2, Map<String, Boolean> memo) {
+        if (s1.equals(s2)) return true;
+
+        String key = s1 + "," + s2;
+        if (memo.containsKey(key)) return memo.get(key);
+
+        int n = s1.length();
+
+        int[] count = new int[26];
+        for (int i = 0; i < n; i++) {
+            count[s1.charAt(i) - 'a']++;
+            count[s2.charAt(i) - 'a']--;
+        }
+
+        for (int x : count) {
+            if (x != 0) {
+                memo.put(key, false);
+                return false;
+            }
+        }
+
+        for (int i = 1; i < n; i++) {
+            boolean noSwap =
+                solve(s1.substring(0, i), s2.substring(0, i), memo) &&
+                solve(s1.substring(i), s2.substring(i), memo);
+
+            boolean swap =
+                solve(s1.substring(0, i), s2.substring(n - i), memo) &&
+                solve(s1.substring(i), s2.substring(0, n - i), memo);
+
+            if (noSwap || swap) {
+                memo.put(key, true);
+                return true;
+            }
+        }
+
+        memo.put(key, false);
+        return false;
+    }
+}
